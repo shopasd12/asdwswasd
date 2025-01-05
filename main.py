@@ -11,12 +11,13 @@ from threading import Thread  # เพิ่มการนำเข้า Threa
 
 # ฟังก์ชัน server_no ที่คุณสร้างไว้เอง
 def server_no():
-    t = Thread(target=reu)  # ใช้ target=reu แทน Tarhrt=run
-    t.start()
+    # ปรับใช้ให้เหมาะสมถ้าใช้ Flask หรือ FastAPI แต่ถ้าไม่ใช้เซิร์ฟเวอร์ก็ไม่ต้องใช้
+    pass
 
 # ฟังก์ชันการเริ่มเซิร์ฟเวอร์
 def reu():
-    app.run(host='0.0.0.0', port=8080)
+    # ใช้แอปพลิเคชันที่เหมาะสม (เช่น Flask หรือ FastAPI) หรือไม่ต้องใช้หากไม่จำเป็น
+    pass
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -122,6 +123,8 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
             await interaction.response.send_message("สลิปวอเล็ทของคุณถูกส่งไปยัง DM เรียบร้อยแล้ว!", ephemeral=True)
         except discord.Forbidden:
             await interaction.response.send_message("ไม่สามารถส่ง DM ได้ กรุณาตรวจสอบการตั้งค่าความเป็นส่วนตัวของคุณ", ephemeral=True)
+        except discord.HTTPException as e:
+            await interaction.response.send_message(f"เกิดข้อผิดพลาดในการส่ง DM: {str(e)}", ephemeral=True)
 
 @client.tree.command(description="ปลอมสลิปทรูมันนี่วอเล็ท")
 async def slip_wallet(interaction: discord.Interaction):
