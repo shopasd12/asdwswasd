@@ -36,6 +36,7 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
     money = discord.ui.TextInput(label="MONEY", placeholder="จำนวนเงิน", required=True, max_length=4, style=discord.TextStyle.short)
 
     async def on_submit(self, interaction: discord.Interaction):
+        # รับข้อมูลจาก Modal
         name_user_id = self.name_user.value 
         name_me_id = self.name_me.value
         phone_me_id = self.phone_me.value
@@ -44,26 +45,30 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
         # สร้างหมายเลขการทำธุรกรรมแบบสุ่ม (Transaction ID)
         transaction_id = ''.join(random.choices(string.digits, k=16))
 
+        # ใช้ timezone ของไทย
         thailand_timezone = pytz.timezone('Asia/Bangkok')
-        current_time_thailand = datetime.now(thailand_timezone)  # แก้ไขจาก datetime.datetime.now()
+        current_time_thailand = datetime.now(thailand_timezone)
         time = current_time_thailand.strftime("%H:%M:%S")
         day = current_time_thailand.strftime("%d")
         month = current_time_thailand.strftime("%m")
         year = current_time_thailand.strftime("%Y")
 
-        image = Image.open("truemoney.png")
+        # สร้างสลิป
+        image = Image.open("truemoney.png")  # ต้องมีไฟล์ภาพ truemoney.png ในโฟลเดอร์เดียวกัน
         draw = ImageDraw.Draw(image)
 
+        # กำหนดขนาดฟอนต์
         font_size_money = 87
         font_size_user = 48
         font_size_me = 48
         font_size_phone = 47
         font_size_time = 46
-        font_size_order = 46  # ขนาดฟอนต์สำหรับหมายเลขการทำธุรกรรม
+        font_size_order = 46
 
         font_path_money = "Lato-Heavy.ttf"
         font_path_user = "Kanit-ExtraLight.ttf"
 
+        # โหลดฟอนต์
         font_money = ImageFont.truetype(font_path_money, font_size_money)
         font_user = ImageFont.truetype(font_path_user, font_size_user)
         font_me = ImageFont.truetype(font_path_user, font_size_me)
@@ -71,15 +76,16 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
         font_time = ImageFont.truetype(font_path_user, font_size_time)
         font_order = ImageFont.truetype(font_path_user, font_size_order)
 
+        # ข้อความที่จะใส่ในสลิป
         phone = phone_me_id
         text_money = f"{money_id}.00"
         text_name_user = name_user_id
         text_name_me = name_me_id
         text_name_phone = f"{phone[:3]}-xxx-{phone[6:]}"
-
         text_name_time = f"{day}/{month}/{year} {time}"
-        text_name_order = transaction_id  # แสดงหมายเลขการทำธุรกรรมที่นี่
+        text_name_order = transaction_id
 
+        # ตำแหน่งข้อความ
         text_position_money = (560, 270)
         text_position_user = (302, 485)
         text_position_me = (302, 648)
@@ -87,13 +93,15 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
         text_position_time = (690, 880)
         text_position_order = (772, 945)
 
+        # สีข้อความ
         text_color_money = (44, 44, 44)
         text_color_user = (0, 0, 0)
         text_color_me = (0, 0, 0)
         text_color_phone = (80, 80, 80)
         text_color_time = (45, 45, 45)
-        text_color_order = (45, 45, 45)  # สีของหมายเลขการทำธุรกรรม
+        text_color_order = (45, 45, 45)
 
+        # เขียนข้อความลงในภาพ
         draw.text(text_position_money, text_money, font=font_money, fill=text_color_money)
         draw.text(text_position_user, text_name_user, font=font_user, fill=text_color_user)
         draw.text(text_position_me, text_name_me, font=font_me, fill=text_color_me)
@@ -101,11 +109,13 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
         draw.text(text_position_time, text_name_time, font=font_time, fill=text_color_time)
         draw.text(text_position_order, text_name_order, font=font_order, fill=text_color_order)
 
+        # บันทึกรูปภาพ
         image.save("truemoney_with_text.png")
-        
+
+        # สร้างไฟล์ discord
         file = discord.File('truemoney_with_text.png')
 
-        # ส่งรูปไปยัง DM ของผู้ใช้
+        # ส่งสลิปไปยัง DM ของผู้ใช้
         user = interaction.user
         try:
             await user.send(file=file)
@@ -132,5 +142,4 @@ async def slip_wallet(interaction: discord.Interaction):
     embed.set_image(url="https://images-ext-1.discordapp.net/external/4xDKAnuLeOoeFUhHfaFgDap5SgjCx_SlpQdtjMAPhqU/https/media.giphy.com/media/fecTAVKVVA2fSzg21J/giphy.gif")
     await interaction.response.send_message(embed=embed, view=view)
 
-# เรียกใช้ bot โดยไม่ต้องตั้งค่าเซิร์ฟเวอร์หรือพอร์ต
 client.run(os.getenv('TOKEN'))
