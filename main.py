@@ -7,17 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 import pytz
 import os
-from threading import Thread  # เพิ่มการนำเข้า Thread เพื่อใช้งานกับ server_no
-
-# ฟังก์ชัน server_no ที่คุณสร้างไว้เอง
-def server_no():
-    # ปรับใช้ให้เหมาะสมถ้าใช้ Flask หรือ FastAPI แต่ถ้าไม่ใช้เซิร์ฟเวอร์ก็ไม่ต้องใช้
-    pass
-
-# ฟังก์ชันการเริ่มเซิร์ฟเวอร์
-def reu():
-    # ใช้แอปพลิเคชันที่เหมาะสม (เช่น Flask หรือ FastAPI) หรือไม่ต้องใช้หากไม่จำเป็น
-    pass
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -33,7 +22,6 @@ class MyClient(discord.Client):
         self.tree.copy_global_to(guild=MYGUILD)
         await self.tree.sync(guild=MYGUILD)
 
-intents = discord.Intents.default()
 client = MyClient(intents=intents)
 
 @client.event
@@ -88,6 +76,7 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
         text_name_user = name_user_id
         text_name_me = name_me_id
         text_name_phone = f"{phone[:3]}-xxx-{phone[6:]}"
+
         text_name_time = f"{day}/{month}/{year} {time}"
         text_name_order = transaction_id  # แสดงหมายเลขการทำธุรกรรมที่นี่
 
@@ -123,8 +112,6 @@ class slipwallet_discord(discord.ui.Modal, title="SLIPWALLET"):
             await interaction.response.send_message("สลิปวอเล็ทของคุณถูกส่งไปยัง DM เรียบร้อยแล้ว!", ephemeral=True)
         except discord.Forbidden:
             await interaction.response.send_message("ไม่สามารถส่ง DM ได้ กรุณาตรวจสอบการตั้งค่าความเป็นส่วนตัวของคุณ", ephemeral=True)
-        except discord.HTTPException as e:
-            await interaction.response.send_message(f"เกิดข้อผิดพลาดในการส่ง DM: {str(e)}", ephemeral=True)
 
 @client.tree.command(description="ปลอมสลิปทรูมันนี่วอเล็ท")
 async def slip_wallet(interaction: discord.Interaction):
@@ -145,7 +132,5 @@ async def slip_wallet(interaction: discord.Interaction):
     embed.set_image(url="https://images-ext-1.discordapp.net/external/4xDKAnuLeOoeFUhHfaFgDap5SgjCx_SlpQdtjMAPhqU/https/media.giphy.com/media/fecTAVKVVA2fSzg21J/giphy.gif")
     await interaction.response.send_message(embed=embed, view=view)
 
-# เรียกใช้ server_no() ที่คุณสร้างเอง
-server_no() 
-
+# เรียกใช้ bot โดยไม่ต้องตั้งค่าเซิร์ฟเวอร์หรือพอร์ต
 client.run(os.getenv('TOKEN'))
